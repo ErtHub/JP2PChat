@@ -55,6 +55,7 @@ public class MessageListener extends Thread{
 				}
 				
 			}
+			clientSocket.close();
 		}
 		
 		catch (IOException e) {
