@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 public class MessageSender extends Thread {
 	private String message;
 	private String hostname;
-	private int port=5678;
+	private int port;
 	
 	public MessageSender () {}
 	

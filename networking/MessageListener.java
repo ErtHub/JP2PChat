@@ -13,7 +13,6 @@ import JP2PChat.WritableGUI;
 
 
 public class MessageListener extends Thread{
-	
 	private int port = 7788;
 	private ServerSocket server;
 	private WritableGUI gui;
@@ -55,6 +54,7 @@ public class MessageListener extends Thread{
 				}
 				
 			}
+			//if there is no clientSocket at all => nullptr exception
 			clientSocket.close();
 		}
 		
