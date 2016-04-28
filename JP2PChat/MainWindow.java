@@ -75,6 +75,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private MessageListener listener;
 	private MessageSender transmitter;
 	
+	
 	public MainWindow() {
     	//listener = new MessageListener(this);
 	    mainPanel = new JPanel();
@@ -157,6 +158,8 @@ public class MainWindow extends JFrame implements WritableGUI{
 //		add(disconnectBtn);
 		
 		//pack();
+		getRootPane().setDefaultButton(sendBtn);
+		//sendBtn.setEnabled(false);
 	}
 	
 	public void write (String str) {
@@ -164,19 +167,21 @@ public class MainWindow extends JFrame implements WritableGUI{
 	}
 	
 	private void listenButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		if(listenPortBar.getText().equals(""))
-			return;
-		
-		listener = new MessageListener(this, Integer.parseInt(listenPortBar.getText()));
-		listener.start();
+		if(!listenPortBar.getText().equals("")) {
+	//		return;	
+			listener = new MessageListener(this, Integer.parseInt(listenPortBar.getText()));
+			listener.start();
+		}
 	}
 	
 	private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(!(writeBox.getText().equals("") || ipBar.getText().equals("") 
 										 || sendPortBar.getText().equals(""))) {
-			
+		
 		transmitter = new MessageSender(writeBox.getText(), ipBar.getText(), 
-									    Integer.parseInt(sendPortBar.getText()));
+									    Integer.parseInt(sendPortBar.getText()),
+									    this.mainPanel
+										);
 		transmitter.start();
 		write(writeBox.getText());
 		}
