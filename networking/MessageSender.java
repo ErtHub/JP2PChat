@@ -23,6 +23,7 @@ public class MessageSender extends Thread {
 			Socket s = new Socket(hostname, port);
 			s.getOutputStream().write(message.getBytes());
 			s.close();
+			
 		}
 		catch (IOException e) {
 			Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, e);

@@ -178,6 +178,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 		transmitter = new MessageSender(writeBox.getText(), ipBar.getText(), 
 									    Integer.parseInt(sendPortBar.getText()));
 		transmitter.start();
+		write(writeBox.getText());
 		}
 		writeBox.setText("");
 	}
