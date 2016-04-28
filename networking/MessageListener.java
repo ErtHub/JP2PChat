@@ -1,5 +1,6 @@
 package networking;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -50,7 +51,7 @@ public class MessageListener extends Thread{
 				String line = br.readLine();
 				
 				if(line != null) {
-					gui.write(line);
+					gui.write(line,Color.BLACK);
 				}
 				
 			}
@@ -59,7 +60,11 @@ public class MessageListener extends Thread{
 		}
 		
 		catch (IOException e) {
-			Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, e);
+			//Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, e);
+			gui.write(e.toString(), Color.RED);
+		}
+		catch(NullPointerException e) {
+			gui.write("Cannot use ports already in use!", Color.RED);
 		}
 	}
 

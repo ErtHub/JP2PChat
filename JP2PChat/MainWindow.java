@@ -1,5 +1,7 @@
 package JP2PChat;
 
+import java.awt.Color;
+import java.awt.Toolkit;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 
@@ -7,8 +9,12 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import networking.MessageListener;
 import networking.MessageSender;
@@ -17,6 +23,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 	/*
 	 * TODO : cosmetics in GUI
 	 */
+	
 	private static final int width = 683;
 	private static final int height = 550;
 	
@@ -59,10 +66,10 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private static final int sendBtnXPos = writeBoxXPos + writeBoxXSize + 10;
 	private static final int sendBtnYPos = writeBoxYPos;
 	private static final int sendBtnXSize = 120;
-	private static final int sendBtnYSize = 40; // TO SET
+	private final int sendBtnYSize = 40; // TO SET
 	
 	private JPanel mainPanel;
-	private JTextArea readBox; //append
+	private JTextPane readBox; //append
 	private JScrollPane scrollPanel;
 	private JTextField writeBox;
 	private JTextField ipBar;
@@ -75,11 +82,12 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private MessageListener listener;
 	private MessageSender transmitter;
 	
+	//private Dimension screenSize;
 	
 	public MainWindow() {
     	//listener = new MessageListener(this);
 	    mainPanel = new JPanel();
-		readBox = new JTextArea();
+		readBox = new JTextPane();
 		scrollPanel = new JScrollPane(readBox);
 		writeBox = new JTextField();
 		ipBar = new JTextField();
@@ -109,12 +117,13 @@ public class MainWindow extends JFrame implements WritableGUI{
 		
 		//setVisible(true);
 		arrangeItems();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 	
 	public void arrangeItems () {
 		add(mainPanel);
 		setSize(width, height);
-		setTitle("JP2PChat alpha");
+		setTitle("JP2PChat version 0.1 alpha");
 		setLayout(null); //TO CHECK LATER
 		
 		/*
@@ -162,9 +171,24 @@ public class MainWindow extends JFrame implements WritableGUI{
 		//sendBtn.setEnabled(false);
 	}
 	
-	public void write (String str) {
-		readBox.append(str + System.lineSeparator());
+	public void write (String str, Color col) {
+		//readBox.append(str + System.lineSeparator());
+		//appendToPane(readBox, str + System.lineSeparator(), Color.RED);
+		appendToPane(readBox, str + System.lineSeparator(), col);
 	}
+	
+	private void appendToPane(JTextPane tp, String msg, Color c) {
+        StyleContext sc = StyleContext.getDefaultStyleContext();
+        AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
+
+        aset = sc.addAttribute(aset, StyleConstants.FontFamily, "Lucida Console");
+        aset = sc.addAttribute(aset, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
+
+        int len = tp.getDocument().getLength();
+        tp.setCaretPosition(len);
+        tp.setCharacterAttributes(aset, false);
+        tp.replaceSelection(msg);
+    }
 	
 	private void listenButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(!listenPortBar.getText().equals("")) {
@@ -180,10 +204,10 @@ public class MainWindow extends JFrame implements WritableGUI{
 		
 		transmitter = new MessageSender(writeBox.getText(), ipBar.getText(), 
 									    Integer.parseInt(sendPortBar.getText()),
-									    this.mainPanel
+									    this
 										);
 		transmitter.start();
-		write(writeBox.getText());
+		write(writeBox.getText(),Color.BLUE);
 		}
 		writeBox.setText("");
 	}
