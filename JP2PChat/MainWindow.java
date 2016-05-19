@@ -52,6 +52,11 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private static final int sendPortBarXSize = 75;
 	private static final int sendPortBarYSize = ipBarYSize; // TO SET
 	
+	private static final int nickBarXPos = sendPortBarXPos + sendPortBarXSize + 10;
+	private static final int nickBarYPos = 10;
+	private static final int nickBarXSize = 125;
+	private static final int nickBarYSize = ipBarYSize;
+	
 	private static final int connectBtnXPos = readBoxXPos + readBoxXSize - 100;
 	private static final int connectBtnYPos = 10;
 	private static final int connectBtnXSize = 100;
@@ -69,12 +74,13 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private final int sendBtnYSize = 40; // TO SET
 	
 	private JPanel mainPanel;
-	private JTextPane readBox; //append
+	private JTextPane readBox; //append @todo: this should be unwritable for users
 	private JScrollPane scrollPanel;
 	private JTextField writeBox;
 	private JTextField ipBar;
 	private JTextField listenPortBar;
 	private JTextField sendPortBar;
+	private JTextField nickBar;
 	private JButton connectBtn;
 	//private JButton disconnectBtn;
 	private JButton sendBtn;
@@ -93,6 +99,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 		ipBar = new JTextField();
 		listenPortBar = new JTextField();
 		sendPortBar = new JTextField();
+		nickBar = new JTextField();
 		connectBtn = new JButton("Connect");
 //		disconnectBtn = new JButton("disConnect");
 		sendBtn = new JButton("Send");
@@ -153,6 +160,9 @@ public class MainWindow extends JFrame implements WritableGUI{
 				sendPortBarXSize, sendPortBarYSize);
 		add(sendPortBar);
 		
+		nickBar.setBounds(nickBarXPos, nickBarYPos, nickBarXSize, nickBarYSize);
+		add(nickBar);
+		
 		connectBtn.setBounds(connectBtnXPos, connectBtnYPos, 
 				connectBtnXSize, connectBtnYSize);
 
@@ -200,14 +210,16 @@ public class MainWindow extends JFrame implements WritableGUI{
 	
 	private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(!(writeBox.getText().equals("") || ipBar.getText().equals("") 
-										 || sendPortBar.getText().equals(""))) {
+				|| sendPortBar.getText().equals("") || nickBar.getText().equals(""))) {
+			
+		String full_statement = "[" + nickBar.getText() +"] " + writeBox.getText();
 		
-		transmitter = new MessageSender(writeBox.getText(), ipBar.getText(), 
+		transmitter = new MessageSender(full_statement, ipBar.getText(), 
 									    Integer.parseInt(sendPortBar.getText()),
 									    this
 										);
 		transmitter.start();
-		write(writeBox.getText(),Color.BLUE);
+		write(full_statement, Color.BLUE);
 		}
 		writeBox.setText("");
 	}
