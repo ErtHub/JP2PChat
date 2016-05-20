@@ -145,7 +145,7 @@ public class MainWindow extends JFrame implements WritableGUI{
             public void windowClosing(java.awt.event.WindowEvent e)
             {
             	Path logFile = Paths.get("C:\\Users\\Ebenezer\\Desktop\\chatlog.txt");
-            	try {
+            	try {					//TODO change this directory to something more sensible
 					Files.write(logFile, history, Charset.forName("UTF-8"));
 				} catch (IOException e1) {
 					write(e1.toString(), Color.RED);
