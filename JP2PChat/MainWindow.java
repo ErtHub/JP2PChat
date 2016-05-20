@@ -4,6 +4,17 @@ import java.awt.Color;
 import java.awt.Toolkit;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -85,12 +96,15 @@ public class MainWindow extends JFrame implements WritableGUI{
 	//private JButton disconnectBtn;
 	private JButton sendBtn;
 	
+	private List<String> history;
+	
 	private MessageListener listener;
 	private MessageSender transmitter;
 	
 	//private Dimension screenSize;
 	
 	public MainWindow() {
+		history = new LinkedList<String>();
     	//listener = new MessageListener(this);
 	    mainPanel = new JPanel();
 		readBox = new JTextPane();
@@ -124,7 +138,26 @@ public class MainWindow extends JFrame implements WritableGUI{
 		
 		//setVisible(true);
 		arrangeItems();
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		
+		addWindowListener(new java.awt.event.WindowAdapter()
+        {
+            public void windowClosing(java.awt.event.WindowEvent e)
+            {
+            	Path logFile = Paths.get("C:\\Users\\Ebenezer\\Desktop\\chatlog.txt");
+            	try {
+					Files.write(logFile, history, Charset.forName("UTF-8"));
+				} catch (IOException e1) {
+					write(e1.toString(), Color.RED);
+				}
+            			
+//                ListIterator<String> iter = history.listIterator();
+//                while(iter.hasNext()) {
+//                	System.out.print(iter.next());
+//                }
+                System.exit(0);
+            }
+        });
 	}
 	
 	public void arrangeItems () {
@@ -185,6 +218,14 @@ public class MainWindow extends JFrame implements WritableGUI{
 		//readBox.append(str + System.lineSeparator());
 		//appendToPane(readBox, str + System.lineSeparator(), Color.RED);
 		appendToPane(readBox, str + System.lineSeparator(), col);
+		history.add(str);
+	}
+	
+	private String getCurrentTimeStamp() {
+	    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	    Date now = new Date();
+	    String strDate = sdfDate.format(now);
+	    return strDate;
 	}
 	
 	private void appendToPane(JTextPane tp, String msg, Color c) {
@@ -212,7 +253,8 @@ public class MainWindow extends JFrame implements WritableGUI{
 		if(!(writeBox.getText().equals("") || ipBar.getText().equals("") 
 				|| sendPortBar.getText().equals("") || nickBar.getText().equals(""))) {
 			
-		String full_statement = "[" + nickBar.getText() +"] " + writeBox.getText();
+		String full_statement = "[" + nickBar.getText() + "]"
+		+ "[" + getCurrentTimeStamp() + "] " + writeBox.getText();
 		
 		transmitter = new MessageSender(full_statement, ipBar.getText(), 
 									    Integer.parseInt(sendPortBar.getText()),
