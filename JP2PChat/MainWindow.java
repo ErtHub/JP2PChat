@@ -5,6 +5,8 @@ import java.awt.Toolkit;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -29,6 +31,10 @@ import javax.swing.text.StyleContext;
 
 import networking.MessageListener;
 import networking.MessageSender;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 
 public class MainWindow extends JFrame implements WritableGUI{
 	/*
@@ -144,12 +150,29 @@ public class MainWindow extends JFrame implements WritableGUI{
         {
             public void windowClosing(java.awt.event.WindowEvent e)
             {
-            	Path logFile = Paths.get("C:\\Users\\Ebenezer\\Desktop\\chatlog.txt");
-            	try {					//TODO change this directory to something more sensible
-					Files.write(logFile, history, Charset.forName("UTF-8"));
-				} catch (IOException e1) {
-					write(e1.toString(), Color.RED);
-				}
+            	if(!history.isEmpty()) {
+            		Path logFile = Paths.get("C:\\Users\\Ebenezer\\Desktop\\" + getCurrentTimeStamp("yyyy-MM-dd HH-mm-ss") + " chatlog.txt");
+            		try {					//TODO change this directory to something more sensible
+            			Files.write(logFile, history, Charset.forName("UTF-8"));
+            		} catch (IOException e1) {
+            			write(e1.toString(), Color.RED);
+            		}
+            	}
+            	
+//            	ListIterator<String> iter = history.listIterator();
+//            	
+//            	try {
+//					File logFile = new File("D:\\" + getCurrentTimeStamp() + "chatlog.txt");
+//	            	BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
+//	            	while(iter.hasNext()) {
+//	            		bw.write(iter.next());
+//	            	}
+//	            	bw.close();
+//            	}
+//	            	catch (IOException e1) {
+//					write(e1.toString(), Color.RED);
+//				}
+
             			
 //                ListIterator<String> iter = history.listIterator();
 //                while(iter.hasNext()) {
@@ -221,8 +244,8 @@ public class MainWindow extends JFrame implements WritableGUI{
 		history.add(str);
 	}
 	
-	private String getCurrentTimeStamp() {
-	    SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	private String getCurrentTimeStamp(String format) {
+	    SimpleDateFormat sdfDate = new SimpleDateFormat(format);
 	    Date now = new Date();
 	    String strDate = sdfDate.format(now);
 	    return strDate;
@@ -254,7 +277,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 				|| sendPortBar.getText().equals("") || nickBar.getText().equals(""))) {
 			
 		String full_statement = "[" + nickBar.getText() + "]"
-		+ "[" + getCurrentTimeStamp() + "] " + writeBox.getText();
+		+ "[" + getCurrentTimeStamp("yyyy-MM-dd HH:mm:ss") + "] " + writeBox.getText();
 		
 		transmitter = new MessageSender(full_statement, ipBar.getText(), 
 									    Integer.parseInt(sendPortBar.getText()),
