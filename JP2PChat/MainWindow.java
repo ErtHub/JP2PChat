@@ -1,12 +1,9 @@
 package JP2PChat;
 
 import java.awt.Color;
-import java.awt.Toolkit;
+import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
-import java.awt.event.WindowEvent;
-import java.io.BufferedWriter;
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -16,10 +13,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -31,10 +28,8 @@ import javax.swing.text.StyleContext;
 
 import networking.MessageListener;
 import networking.MessageSender;
-
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
+import networking.PingListener;
+import networking.PingSender;
 
 public class MainWindow extends JFrame implements WritableGUI{
 	/*
@@ -90,6 +85,11 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private static final int sendBtnXSize = 120;
 	private final int sendBtnYSize = 40; // TO SET
 	
+	private static final int indicatorXPos = nickBarXPos + nickBarXSize + 5;
+	private static final int indicatorYPos =  nickBarYPos - 15; //nadmiar
+	private static final int indicatorSize = readBoxYPos;
+	
+	
 	private JPanel mainPanel;
 	private JTextPane readBox; //append @todo: this should be unwritable for users
 	private JScrollPane scrollPanel;
@@ -101,11 +101,15 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private JButton connectBtn;
 	//private JButton disconnectBtn;
 	private JButton sendBtn;
+	private JLabel indicator;
 	
 	private List<String> history;
 	
 	private MessageListener listener;
 	private MessageSender transmitter;
+	private PingSender pingSender;
+	private PingListener pingReceiver;
+	
 	
 	//private Dimension screenSize;
 	
@@ -123,6 +127,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 		connectBtn = new JButton("Connect");
 //		disconnectBtn = new JButton("disConnect");
 		sendBtn = new JButton("Send");
+		indicator = new JLabel("•");
 
 		connectBtn.addActionListener(new java.awt.event.ActionListener() {
 			public void actionPerformed(java.awt.event.ActionEvent e) {
@@ -144,9 +149,9 @@ public class MainWindow extends JFrame implements WritableGUI{
 		
 		//setVisible(true);
 		arrangeItems();
-		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		addWindowListener(new java.awt.event.WindowAdapter()
+		/*addWindowListener(new java.awt.event.WindowAdapter()
         {
             public void windowClosing(java.awt.event.WindowEvent e)
             {
@@ -180,7 +185,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 //                }
                 System.exit(0);
             }
-        });
+        });*/
 	}
 	
 	public void arrangeItems () {
@@ -232,6 +237,12 @@ public class MainWindow extends JFrame implements WritableGUI{
 //		   disconnectBtnXSize, disconnectBtnYSize);
 //		add(disconnectBtn);
 		
+		indicator.setForeground(Color.red);
+		indicator.setBounds(indicatorXPos,indicatorYPos, indicatorSize,indicatorSize);
+		indicator.setFont(new Font("•", Font.PLAIN, readBoxYPos));
+		add(indicator);
+		
+		
 		//pack();
 		getRootPane().setDefaultButton(sendBtn);
 		//sendBtn.setEnabled(false);
@@ -263,12 +274,21 @@ public class MainWindow extends JFrame implements WritableGUI{
         tp.setCharacterAttributes(aset, false);
         tp.replaceSelection(msg);
     }
-	
+
+	   
 	private void listenButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(!listenPortBar.getText().equals("")) {
 	//		return;	
 			listener = new MessageListener(this, Integer.parseInt(listenPortBar.getText()));
 			listener.start();
+			
+			pingReceiver = new PingListener(this);
+			pingReceiver.start();
+			
+			pingSender = new PingSender(ipBar.getText(), this);
+			pingSender.start();
+			//poprawic pinga na puste pola, bo rzuca wyjatki jak ash pokeballe
+			
 		}
 	}
 	
@@ -287,5 +307,10 @@ public class MainWindow extends JFrame implements WritableGUI{
 		write(full_statement, Color.BLUE);
 		}
 		writeBox.setText("");
+		
+	}
+	
+	public void setIndicator(Color color){
+		indicator.setForeground(color);
 	}
 }

@@ -7,18 +7,24 @@ import java.net.Socket;
 import JP2PChat.MainWindow;
 
 public class MessageSender extends Thread {
-	private String message;
-	private String hostname;
-	private int port;
-	private MainWindow gui;
-	
-	public MessageSender () {}
+	protected String message;
+	protected String hostname;
+	protected int port = 7788;
+	protected MainWindow gui;
+	//private boolean use = false;
 	
 	public MessageSender (String message, String hostname, int port, MainWindow gui) {
 		this.message = message;
 		this.hostname = hostname;
 		this.port = port;
 		this.gui = gui;
+		//this.use = true;
+	}
+	
+	public MessageSender (String hostname, MainWindow gui) {
+		this.hostname = hostname;
+		this.gui = gui;
+		this.message = "ping";
 	}
 	
 	public void run () {

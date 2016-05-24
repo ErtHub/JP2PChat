@@ -7,16 +7,16 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import JP2PChat.WritableGUI;
 
 
-public class MessageListener extends Thread{
-	private int port = 7788;
-	private ServerSocket server;
-	private WritableGUI gui;
+public class MessageListener extends Thread {
+	protected int port;
+	protected ServerSocket server;
+	protected WritableGUI gui;
+	//private Timer timer;
 	
 //	private void setServerSocket (int port) {
 //		try {
@@ -31,6 +31,7 @@ public class MessageListener extends Thread{
 //		setServerSocket (port);
 //	}
 	
+		
 	public MessageListener (WritableGUI gui, int port) {
 		this.gui = gui;
 		this.port = port;
@@ -39,21 +40,21 @@ public class MessageListener extends Thread{
 		}
 		catch (IOException e){
 			Logger.getLogger(MessageListener.class.getName());
-		}
+		}	
 	}
 	
 	public void run () {
 		Socket clientSocket;
 		try {
-			while((clientSocket = server.accept()) != null) {
+			while((clientSocket = server.accept()) != null) {		
 				InputStream is = clientSocket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
 				String line = br.readLine();
 				
-				if(line != null) {
-					gui.write(line,Color.BLACK);
-				}
-				
+					if(line != null ) {
+						gui.write(line,Color.BLACK);
+					}
+
 			}
 			//if there is no clientSocket at all => nullptr exception
 			clientSocket.close();
