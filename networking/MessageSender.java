@@ -21,10 +21,11 @@ public class MessageSender extends Thread {
 		//this.use = true;
 	}
 	
-	public MessageSender (String hostname, MainWindow gui) {
+	public MessageSender (String hostname, MainWindow gui, Integer port) {
 		this.hostname = hostname;
 		this.gui = gui;
 		this.message = "ping";
+		this.port = port;
 	}
 	
 	public void run () {

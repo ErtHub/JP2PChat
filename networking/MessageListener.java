@@ -54,10 +54,10 @@ public class MessageListener extends Thread {
 					if(line != null ) {
 						gui.write(line,Color.BLACK);
 					}
-
+			clientSocket.close();
 			}
 			//if there is no clientSocket at all => nullptr exception
-			clientSocket.close();
+			
 		}
 		
 		catch (IOException e) {

@@ -4,15 +4,17 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -32,6 +34,12 @@ import networking.PingListener;
 import networking.PingSender;
 
 public class MainWindow extends JFrame implements WritableGUI{
+	
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	
 	private static final int width = 683;
 	private static final int height = 550;
@@ -89,7 +97,6 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private JTextField sendPortBar;
 	private JTextField nickBar;
 	private JButton connectBtn;
-	//private JButton disconnectBtn;
 	private JButton sendBtn;
 	private JLabel indicator;
 	
@@ -100,12 +107,8 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private PingSender pingSender;
 	private PingListener pingReceiver;
 	
-	
-	//private Dimension screenSize;
-	
 	public MainWindow() {
 		history = new LinkedList<String>();
-    	//listener = new MessageListener(this);
 	    mainPanel = new JPanel();
 		readBox = new JTextPane();
 		scrollPanel = new JScrollPane(readBox);
@@ -115,7 +118,6 @@ public class MainWindow extends JFrame implements WritableGUI{
 		sendPortBar = new JTextField();
 		nickBar = new JTextField();
 		connectBtn = new JButton("Connect");
-//		disconnectBtn = new JButton("disConnect");
 		sendBtn = new JButton("Send");
 		indicator = new JLabel("•");
 
@@ -137,63 +139,50 @@ public class MainWindow extends JFrame implements WritableGUI{
 	        }
 	    });
 		
-		//setVisible(true);
 		arrangeItems();
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
-		/*addWindowListener(new java.awt.event.WindowAdapter()
+		addWindowListener(new java.awt.event.WindowAdapter()
         {
             public void windowClosing(java.awt.event.WindowEvent e)
             {
             	if(!history.isEmpty()) {
-            		Path logFile = Paths.get("C:\\Users\\Ebenezer\\Desktop\\" + getCurrentTimeStamp("yyyy-MM-dd HH-mm-ss") + " chatlog.txt");
-            		try {					//TODO change this directory to something more sensible
-            			Files.write(logFile, history, Charset.forName("UTF-8"));
-            		} catch (IOException e1) {
+            		Path logFile = Paths.get(getCurrentTimeStamp("yyyy-MM-dd HH-mm-ss") + " chatlog.txt");
+            		try {
+            			String path = "." + File.separator + "Archive" + File.separator + nickBar.getText() + File.separator + logFile.toString();
+            			
+            			File f = new File(path);
+            			f.getParentFile().mkdirs(); 
+            			f.createNewFile();
+            			
+            			ListIterator<String> iter = history.listIterator();
+            			FileWriter fstream = new FileWriter(path);
+                        BufferedWriter out = new BufferedWriter(fstream);
+            			
+            			while(iter.hasNext()) {
+            				out.write(iter.next());
+            				out.newLine();
+            			}
+            			out.close();
+            		} 
+            		catch (IOException e1) {
             			write(e1.toString(), Color.RED);
             		}
             	}
-            	
-//            	ListIterator<String> iter = history.listIterator();
-//            	
-//            	try {
-//					File logFile = new File("D:\\" + getCurrentTimeStamp() + "chatlog.txt");
-//	            	BufferedWriter bw = new BufferedWriter(new FileWriter(logFile));
-//	            	while(iter.hasNext()) {
-//	            		bw.write(iter.next());
-//	            	}
-//	            	bw.close();
-//            	}
-//	            	catch (IOException e1) {
-//					write(e1.toString(), Color.RED);
-//				}
-
-            			
-//                ListIterator<String> iter = history.listIterator();
-//                while(iter.hasNext()) {
-//                	System.out.print(iter.next());
-//                }
                 System.exit(0);
             }
-        });*/
+        });
 	}
 	
 	public void arrangeItems () {
 		add(mainPanel);
 		setSize(width, height);
-		setTitle("JP2PChat version 0.1 alpha");
-		setLayout(null); //TO CHECK LATER
+		setTitle("JP2PChat version 0.9c beta");
+		setLayout(null); 
 		
-		/*
-		readBox.setBounds(readBoxXPos, readBoxYPos,
-				readBoxXSize, readBoxYSize);
-		//TODO move writing cursor to bottom of text field
-		add(readBox);
-		*/
 		readBox.setEditable(false);
 		scrollPanel.setBounds(readBoxXPos, readBoxYPos,
 				readBoxXSize, readBoxYSize);
-		//TODO move writing cursor to bottom of text field
 		add(scrollPanel);
 		
 		writeBox.setBounds(writeBoxXPos, writeBoxYPos,
@@ -224,19 +213,12 @@ public class MainWindow extends JFrame implements WritableGUI{
 				sendBtnXSize, sendBtnYSize);
 		add(sendBtn);
 		
-//		disconnectBtn.setBounds(disconnectBtnXPos, disconnectBtnYPos, 
-//		   disconnectBtnXSize, disconnectBtnYSize);
-//		add(disconnectBtn);
-		
 		indicator.setForeground(Color.red);
 		indicator.setBounds(indicatorXPos,indicatorYPos, indicatorSize,indicatorSize);
 		indicator.setFont(new Font("•", Font.PLAIN, readBoxYPos));
 		add(indicator);
 		
-		
-		//pack();
 		getRootPane().setDefaultButton(sendBtn);
-		//sendBtn.setEnabled(false);
 	}
 	
 	public void write (String str, Color col) {
@@ -271,13 +253,26 @@ public class MainWindow extends JFrame implements WritableGUI{
 	   
 	private void listenButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(!listenPortBar.getText().equals("") && !sendPortBar.getText().equals("") && !ipBar.getText().equals("")) {
-			listener = new MessageListener(this, Integer.parseInt(listenPortBar.getText()));
+			Integer listenPort = Integer.parseInt(listenPortBar.getText());
+			Integer sendPort = Integer.parseInt(sendPortBar.getText());
+			
+			listener = new MessageListener(this, listenPort);
 			listener.start();
 			
-			pingReceiver = new PingListener(this);
+			if (sendPort - listenPort == 1 || sendPort - listenPort == -1 )
+			{
+				sendPort+=2;
+				listenPort+=2;
+			}
+			else
+			{
+				++sendPort;
+				++listenPort;
+			}
+			pingReceiver = new PingListener(this,listenPort);
 			pingReceiver.start();
 			
-			pingSender = new PingSender(ipBar.getText(), this);
+			pingSender = new PingSender(ipBar.getText(), this, sendPort);
 			pingSender.start();
 			
 		}

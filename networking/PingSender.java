@@ -9,8 +9,9 @@ import JP2PChat.MainWindow;
 public class PingSender extends MessageSender {
 	
 	private long tStart = System.currentTimeMillis();
-	public PingSender(String hostname, MainWindow gui) {
-		super(hostname, gui);
+	public PingSender(String hostname, MainWindow gui, Integer port) {
+		super(hostname, gui, port);
+		
 	}
 	
 	public void run () {
