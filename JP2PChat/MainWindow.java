@@ -33,11 +33,16 @@ import networking.MessageSender;
 import networking.PingListener;
 import networking.PingSender;
 
+/**
+ * 
+ * Main GUI class, holds all graphical elements, their size and position
+ * Binds button events with proper actions
+ */
 public class MainWindow extends JFrame implements WritableGUI{
 	
-	
 	/**
-	 * 
+	 * variable added to get rid of compiler warning about 
+	 * serializable class
 	 */
 	private static final long serialVersionUID = 1L;
 	
@@ -89,7 +94,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private static final int indicatorSize = readBoxYPos;
 	
 	private JPanel mainPanel;
-	private JTextPane readBox; //append @todo: this should be unwritable for users
+	private JTextPane readBox;
 	private JScrollPane scrollPanel;
 	private JTextField writeBox;
 	private JTextField ipBar;
@@ -106,7 +111,11 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private MessageSender transmitter;
 	private PingSender pingSender;
 	private PingListener pingReceiver;
-	
+	/**
+	 * Allocates memory for GUI on heap and calls arrangeItems function
+	 * Overrides public void windowClosing(WindowEvent e) in WindowAdapter
+	 * for chat history saving on program quit
+	 */
 	public MainWindow() {
 		history = new LinkedList<String>();
 	    mainPanel = new JPanel();
@@ -142,6 +151,10 @@ public class MainWindow extends JFrame implements WritableGUI{
 		arrangeItems();
 		setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		
+		/**
+		 * Overrides public void windowClosing(WindowEvent e) in WindowAdapter
+		 * for chat history saving on program quit
+		 */
 		addWindowListener(new java.awt.event.WindowAdapter()
         {
             public void windowClosing(java.awt.event.WindowEvent e)
@@ -173,7 +186,12 @@ public class MainWindow extends JFrame implements WritableGUI{
             }
         });
 	}
-	
+	/**
+	 * Sets size and position of each element in GUI
+	 * Sets send button as default in order to use Enter hotkey
+	 * Marks readBox as uneditable to prevent user from writing on it 
+	 * without sending message
+	 */
 	public void arrangeItems () {
 		add(mainPanel);
 		setSize(width, height);
@@ -221,22 +239,35 @@ public class MainWindow extends JFrame implements WritableGUI{
 		getRootPane().setDefaultButton(sendBtn);
 	}
 	
+	/**
+	 * Method used to display sent or received message on readBox
+	 * setEditable manipulation is used to prevent user from writing on it
+	 * without sending message (read only)
+	 */
 	public void write (String str, Color col) {
-		//readBox.append(str + System.lineSeparator());
-		//appendToPane(readBox, str + System.lineSeparator(), Color.RED);
 		readBox.setEditable(true);
 		appendToPane(readBox, str + System.lineSeparator(), col);
 		history.add(str);
 		readBox.setEditable(false);
 	}
 	
+	/**
+	 * Gets current time stamp in proper template
+	 * @param format - template of time format
+	 * @return String holding current time properly formatted
+	 */
 	private String getCurrentTimeStamp(String format) {
 	    SimpleDateFormat sdfDate = new SimpleDateFormat(format);
 	    Date now = new Date();
 	    String strDate = sdfDate.format(now);
 	    return strDate;
 	}
-	
+	/**
+	 * Method controls style and format of sent and received messages
+	 * @param tp - text pane to write on
+	 * @param msg - message to write
+	 * @param c - color of message
+	 */
 	private void appendToPane(JTextPane tp, String msg, Color c) {
         StyleContext sc = StyleContext.getDefaultStyleContext();
         AttributeSet aset = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
@@ -250,7 +281,16 @@ public class MainWindow extends JFrame implements WritableGUI{
         tp.replaceSelection(msg);
     }
 
-	   
+	/**
+	 * Method is bound with listen button
+	 * Starts 3 threads :
+	 * - listening for incoming messages
+	 * - listening for ping
+	 * - sending ping messages
+	 * Each thread use different port
+	 * which is also set here
+	 * @param evt listenButton pressed ActionEvent
+	 */
 	private void listenButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if(!listenPortBar.getText().equals("") && !sendPortBar.getText().equals("") && !ipBar.getText().equals("")) {
 			Integer listenPort = Integer.parseInt(listenPortBar.getText());
@@ -278,24 +318,30 @@ public class MainWindow extends JFrame implements WritableGUI{
 		}
 	}
 	
+	/**
+	 * Method is bound with send button
+	 * Starts thread which only sends a message to another client
+	 * Message is formatted here by adding nick and currentTimeStamp
+	 * @param evt sendButton pressed ActionEvent
+	 */
 	private void sendButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		if(!(writeBox.getText().equals("") || ipBar.getText().equals("") 
-				|| sendPortBar.getText().equals("") || nickBar.getText().equals(""))) {
+		if(!(writeBox.getText().equals("") || ipBar.getText().equals("") || sendPortBar.getText().equals("") || nickBar.getText().equals(""))) {
 			
-		String full_statement = "[" + nickBar.getText() + "]"
-		+ "[" + getCurrentTimeStamp("yyyy-MM-dd HH:mm:ss") + "] " + writeBox.getText();
+			String full_statement = "[" + nickBar.getText() + "]" + "[" + getCurrentTimeStamp("yyyy-MM-dd HH:mm:ss") + "] " + writeBox.getText();
 		
-		transmitter = new MessageSender(full_statement, ipBar.getText(), 
-									    Integer.parseInt(sendPortBar.getText()),
-									    this
-										);
-		transmitter.start();
-		write(full_statement, Color.BLUE);
+			transmitter = new MessageSender(full_statement, ipBar.getText(), Integer.parseInt(sendPortBar.getText()), this);
+			
+			transmitter.start();
+			write(full_statement, Color.BLUE);
 		}
 		writeBox.setText("");
-		
 	}
-	
+	/**
+	 * Method overridden from WritableGUI interface
+	 * Enables to set indicator color :
+	 * Available - green
+	 * Disconnected - red
+	 */
 	public void setIndicator(Color color){
 		indicator.setForeground(color);
 	}

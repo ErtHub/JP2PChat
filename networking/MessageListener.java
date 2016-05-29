@@ -11,27 +11,23 @@ import java.util.logging.Logger;
 
 import JP2PChat.WritableGUI;
 
-
+/**
+* Class derived from Thread
+* Each instance of class runs in separate thread
+* MessageListener is used to listen to messages using peer-to-peer
+* achieved by socket - serverSocket connection
+*/
 public class MessageListener extends Thread {
 	protected int port;
 	protected ServerSocket server;
 	protected WritableGUI gui;
-	//private Timer timer;
-	
-//	private void setServerSocket (int port) {
-//		try {
-//			server = new ServerSocket(port);
-//		}
-//		catch (IOException e){
-//			Logger.getLogger(MessageListener.class.getName());
-//		}
-//	}
-	
-//	public MessageListener () {
-//		setServerSocket (port);
-//	}
-	
-		
+
+	/**
+	 * class Constructor
+	 * creating object with ServerSocket on specified port
+	 * @param gui - gui to write to received message
+	 * @param port - port to listen on
+	 */
 	public MessageListener (WritableGUI gui, int port) {
 		this.gui = gui;
 		this.port = port;
@@ -43,6 +39,10 @@ public class MessageListener extends Thread {
 		}	
 	}
 	
+	/**
+	 * Method overridden from Thread
+	 * Listens for user messages on specified port
+	 */
 	public void run () {
 		Socket clientSocket;
 		try {
@@ -55,18 +55,14 @@ public class MessageListener extends Thread {
 						gui.write(line,Color.BLACK);
 					}
 			clientSocket.close();
-			}
-			//if there is no clientSocket at all => nullptr exception
-			
+			}			
 		}
 		
 		catch (IOException e) {
-			//Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, e);
 			gui.write(e.toString(), Color.RED);
 		}
 		catch(NullPointerException e) {
 			gui.write("Cannot use ports already in use!", Color.RED);
 		}
 	}
-
 }
