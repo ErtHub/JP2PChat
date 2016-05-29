@@ -11,11 +11,9 @@ import JP2PChat.MainWindow;
 
 public class PingListener extends MessageListener {
 	
-	private static int pingPort = 7788;
-	//private Timer timer;
-	private int timer = 0;
+	private long tStart = System.currentTimeMillis();
 	
-	public PingListener(MainWindow gui) {
+	public PingListener(MainWindow gui, Integer pingPort) {
 		super(gui, pingPort);
 	}
 	
@@ -23,29 +21,28 @@ public class PingListener extends MessageListener {
 		Socket clientSocket;	
 		try {
 			while((clientSocket = server.accept()) != null) {		
-				/*InputStream is = clientSocket.getInputStream();
+				InputStream is = clientSocket.getInputStream();
 				BufferedReader br = new BufferedReader(new InputStreamReader(is));
 				String line = br.readLine();
-				*/
-				/*if(line != null ) {
-					gui.write(line,Color.BLACK);
-				}*/
-				++timer;
-				if(timer > 300)
-				{
-					gui.setIndicator(Color.red);
-					//break;
+				
+				long tEnd = System.currentTimeMillis();
+				long tDelta = tEnd - tStart;
+				double elapsedSeconds = tDelta;
+				
+				if(elapsedSeconds > 300) {
+					if (line != null) {
+						gui.setIndicator(Color.green);
+					}
+					else {
+						gui.setIndicator(Color.red);
+					}
 				}
-				else 
-				{
-					gui.setIndicator(Color.green);
-				}
-			}
-			//if there is no clientSocket at all => nullptr exception
+					
+			br.close();
 			clientSocket.close();
+			}			
 		}
 		catch (IOException e) {
-			//Logger.getLogger(MessageListener.class.getName()).log(Level.SEVERE, null, e);
 			gui.write(e.toString(), Color.RED);
 		}
 		catch(NullPointerException e) {

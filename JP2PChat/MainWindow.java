@@ -32,9 +32,6 @@ import networking.PingListener;
 import networking.PingSender;
 
 public class MainWindow extends JFrame implements WritableGUI{
-	/*
-	 * TODO : cosmetics in GUI
-	 */
 	
 	private static final int width = 683;
 	private static final int height = 550;
@@ -47,22 +44,22 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private static final int writeBoxXPos = readBoxXPos;
 	private static final int writeBoxYPos = readBoxYSize + readBoxYPos + 10;
 	private static final int writeBoxXSize = readBoxXSize - 130;
-	private static final int writeBoxYSize = 40; // TO SET
+	private static final int writeBoxYSize = 40; 
 
 	private static final int ipBarXPos = readBoxXPos;
 	private static final int ipBarYPos = 10;
 	private static final int ipBarXSize = 150;
-	private static final int ipBarYSize = 20; // TO SET
-	//create variable for separator size to eliminate 10 in code
+	private static final int ipBarYSize = 20; 
+
 	private static final int listenPortBarXPos = readBoxXPos + ipBarXSize + 10;
 	private static final int listenPortBarYPos = 10;
 	private static final int listenPortBarXSize = 75;
-	private static final int listenPortBarYSize = ipBarYSize; // TO SET
+	private static final int listenPortBarYSize = ipBarYSize; 
 	
 	private static final int sendPortBarXPos = listenPortBarXPos + listenPortBarXSize + 10;
 	private static final int sendPortBarYPos = 10;
 	private static final int sendPortBarXSize = 75;
-	private static final int sendPortBarYSize = ipBarYSize; // TO SET
+	private static final int sendPortBarYSize = ipBarYSize; 
 	
 	private static final int nickBarXPos = sendPortBarXPos + sendPortBarXSize + 10;
 	private static final int nickBarYPos = 10;
@@ -72,23 +69,16 @@ public class MainWindow extends JFrame implements WritableGUI{
 	private static final int connectBtnXPos = readBoxXPos + readBoxXSize - 100;
 	private static final int connectBtnYPos = 10;
 	private static final int connectBtnXSize = 100;
-	private static final int connectBtnYSize = 35; // TO SET
-	
-	//private static final int disconnectBtnXPos = connectBtnXPos + connectBtnXSize + 10;
-	//private static final int disconnectBtnYPos = 10;
-	//private static final int disconnectBtnXSize = 120;
-	//private static final int disconnectBtnYSize = ipBarYSize; 
-	// TO SET
+	private static final int connectBtnYSize = 35; 
 	
 	private static final int sendBtnXPos = writeBoxXPos + writeBoxXSize + 10;
 	private static final int sendBtnYPos = writeBoxYPos;
 	private static final int sendBtnXSize = 120;
-	private final int sendBtnYSize = 40; // TO SET
+	private final int sendBtnYSize = 40; 
 	
 	private static final int indicatorXPos = nickBarXPos + nickBarXSize + 5;
-	private static final int indicatorYPos =  nickBarYPos - 15; //nadmiar
+	private static final int indicatorYPos =  nickBarYPos - 15; 
 	private static final int indicatorSize = readBoxYPos;
-	
 	
 	private JPanel mainPanel;
 	private JTextPane readBox; //append @todo: this should be unwritable for users
@@ -200,6 +190,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 		//TODO move writing cursor to bottom of text field
 		add(readBox);
 		*/
+		readBox.setEditable(false);
 		scrollPanel.setBounds(readBoxXPos, readBoxYPos,
 				readBoxXSize, readBoxYSize);
 		//TODO move writing cursor to bottom of text field
@@ -251,8 +242,10 @@ public class MainWindow extends JFrame implements WritableGUI{
 	public void write (String str, Color col) {
 		//readBox.append(str + System.lineSeparator());
 		//appendToPane(readBox, str + System.lineSeparator(), Color.RED);
+		readBox.setEditable(true);
 		appendToPane(readBox, str + System.lineSeparator(), col);
 		history.add(str);
+		readBox.setEditable(false);
 	}
 	
 	private String getCurrentTimeStamp(String format) {
@@ -277,8 +270,7 @@ public class MainWindow extends JFrame implements WritableGUI{
 
 	   
 	private void listenButtonActionPerformed(java.awt.event.ActionEvent evt) {
-		if(!listenPortBar.getText().equals("")) {
-	//		return;	
+		if(!listenPortBar.getText().equals("") && !sendPortBar.getText().equals("") && !ipBar.getText().equals("")) {
 			listener = new MessageListener(this, Integer.parseInt(listenPortBar.getText()));
 			listener.start();
 			
@@ -287,7 +279,6 @@ public class MainWindow extends JFrame implements WritableGUI{
 			
 			pingSender = new PingSender(ipBar.getText(), this);
 			pingSender.start();
-			//poprawic pinga na puste pola, bo rzuca wyjatki jak ash pokeballe
 			
 		}
 	}
